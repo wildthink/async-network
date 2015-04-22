@@ -24,7 +24,7 @@
 
 #import "AsyncConnection.h"
 #import "AsyncRequest.h"
-#import "iOSXData.h"
+#import "ASKeyedArchiver.h"
 
 #define AsyncConnectionHeaderSize sizeof(AsyncConnectionHeader)
 const NSUInteger AsyncConnectionHeaderTag = 1;
@@ -37,7 +37,8 @@ const NSUInteger AsyncConnectionTypeResponse = 3;
 NSData *HeaderToData(AsyncConnectionHeader header);
 AsyncConnectionHeader DataToHeader(NSData *data);
 
-@interface AsyncConnection () <NSKeyedArchiverDelegate, NSKeyedUnarchiverDelegate>
+@interface AsyncConnection ()
+
 - (void)sendHeader:(AsyncConnectionHeader)header object:(id<NSCoding>)object;
 - (void)sendResponse:(id<NSCoding>)object tag:(UInt32)tag;
 - (void)respondToMessageWithHeader:(AsyncConnectionHeader)header object:(id<NSCoding>)object;
@@ -230,7 +231,6 @@ AsyncConnectionHeader DataToHeader(NSData *data);
 	[self sendCommand:0 object:object responseBlock:nil];
 }
 
-
 #pragma mark - Private Methods
 
 // generic send
@@ -242,8 +242,7 @@ AsyncConnectionHeader DataToHeader(NSData *data);
 	NSData *bodyData = nil;
     NSLog (@"JMJ %@", object);
 	if (object) {
-        //        bodyData = [NSKeyedArchiver archivedDataWithRootObject:object delegate:self];
-        bodyData = [self archivedDataWithRootObject:object delegate:self];
+        bodyData = [ASKeyedArchiver archivedDataWithRootObject:object];
 		header.bodyLength = (UInt32)bodyData.length;
 	}
 	
@@ -369,7 +368,7 @@ AsyncConnectionHeader DataToHeader(NSData *data);
 
 		// body
 		case AsyncConnectionBodyTag:
-            object = [NSKeyedUnarchiver unarchiveObjectWithData:data delegate:self];
+            object = [ASKeyedUnarchiver unarchiveObjectWithData:data];
 			[self respondToMessageWithHeader:_lastHeader object:object];
 			[self.socket readDataToLength:AsyncConnectionHeaderSize withTimeout:self.timeout tag:AsyncConnectionHeaderTag];
 			break;
@@ -380,44 +379,6 @@ AsyncConnectionHeader DataToHeader(NSData *data);
 	}
 }
 
-#pragma mark - Un/Archiver substitutions
-
-- (NSData*) archivedDataWithRootObject:anObject delegate:(id<NSKeyedArchiverDelegate>)delegate;
-{
-    NSMutableData *mdata = [NSMutableData new];
-    NSKeyedArchiver *arc = [[NSKeyedArchiver alloc] initForWritingWithMutableData:mdata];
-    arc.delegate = delegate;
-    
-    [arc encodeObject:anObject];
-    [arc finishEncoding];
-    arc.delegate = nil;
-    return mdata;
-}
-
-// Transform UIImage and NSImage to platform independant Class wrapper and value
-- (id)unarchiver:(NSKeyedUnarchiver *)unarchiver didDecodeObject:(id) NS_RELEASES_ARGUMENT object NS_RETURNS_RETAINED;
-{
-    if ([object isKindOfClass:[iOSXData class]]) {
-        return [(iOSXData*)object nativeObject];
-    }
-    // else
-    return object;
-}
-
-- (id)archiver:(NSKeyedArchiver *)archiver willEncodeObject:(id)object;
-{
-    if ([object isKindOfClass:[Image class]]) {
-        iOSXImage *ip = [[iOSXImage alloc] initWithImage:object];
-        return ip;
-    }
-    // else
-    if ([object isKindOfClass:[Color class]]) {
-        iOSXColor *cp = [[iOSXColor alloc] initWithColor:object];
-        return cp;
-    }
-    // else
-    return object;
-}
 
 @end
 
