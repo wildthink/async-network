@@ -23,7 +23,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import <AsyncNetwork/AsyncNetwork.h>
+#import "AsyncNetwork.h"
 
 @interface ServerController : NSWindowController <AsyncServerDelegate>
 
