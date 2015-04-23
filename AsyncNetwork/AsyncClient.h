@@ -28,6 +28,13 @@
 
 @class AsyncClient;
 
+typedef NS_ENUM(NSInteger, AsyncClientEventType) {
+    AsyncClientDidFindServiceEvent,
+    AsyncClientDidRemoveServiceEvent,
+    AsyncClientDidConnectEvent,
+    AsyncClientDidDisconnectEvent
+};
+
 /// AsyncClient delegate protocol
 @protocol AsyncClientDelegate <NSObject>
 @optional
@@ -40,6 +47,8 @@
 - (void)client:(AsyncClient *)theClient didReceiveCommand:(AsyncCommand)command object:(id)object connection:(AsyncConnection *)connection;
 - (void)client:(AsyncClient *)theClient didReceiveCommand:(AsyncCommand)command object:(id)object connection:(AsyncConnection *)connection responseBlock:(AsyncNetworkResponseBlock)block;
 - (void)client:(AsyncClient *)theClient didFailWithError:(NSError *)error;
+
+- (void)client:(AsyncClient *)theClient event:(AsyncClientEventType)eventType object:object;
 
 @end
 

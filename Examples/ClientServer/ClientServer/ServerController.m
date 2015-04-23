@@ -103,17 +103,20 @@
 	[self.output insertText:string];
 	
 	// update the status
+    self.imageView.image = nil;
     [self updateStatus];
 }
 
 - (void)server:(AsyncServer *)theServer didReceiveCommand:(AsyncCommand)command object:(id)object connection:(AsyncConnection *)connection;
 {
 	// display log entry
-    NSString *string = [NSString stringWithFormat:@"<< [%@] %@\n", connection.host, object];
-	[self.output insertText:string];
     
     if ([object isKindOfClass:[NSImage class]]) {
         self.imageView.image = object;
+    }
+    else {
+        NSString *string = [NSString stringWithFormat:@"<< [%@] %@\n", connection.host, object];
+        [self.output insertText:string];        
     }
 }
 

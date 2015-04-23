@@ -214,8 +214,6 @@ AsyncConnectionHeader DataToHeader(NSData *data);
 	} else {
 		header.blockTag = 0;
 	}
-    NSLog (@"JMJ %@", object);
-
 	[self sendHeader:header object:object];
 }
 
@@ -240,8 +238,8 @@ AsyncConnectionHeader DataToHeader(NSData *data);
 	
 	// encode data
 	NSData *bodyData = nil;
-    NSLog (@"JMJ %@", object);
-	if (object) {
+
+    if (object) {
         bodyData = [ASKeyedArchiver archivedDataWithRootObject:object];
 		header.bodyLength = (UInt32)bodyData.length;
 	}

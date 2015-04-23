@@ -116,7 +116,6 @@
 {
 	for (AsyncConnection *connection in self.connections) {
 		if (![connection connected]) continue;
-        NSLog (@"JMJ %@", object);
 		[connection sendCommand:command object:object responseBlock:block];
 	}
 }

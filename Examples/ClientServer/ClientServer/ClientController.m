@@ -122,7 +122,7 @@
         msg = [NSString stringWithFormat:@"<< [%@] %@\n", connection.netService.name, object];
     }
     else if ([object isKindOfClass:[NSImage class]]) {
-        msg = [NSString stringWithFormat:@"<< [%@] %@\n", connection.netService.name, [object class]];
+//        msg = [NSString stringWithFormat:@"<< [%@] %@\n", connection.netService.name, [object class]];
         self.imageView.image = object;
     }
     else {

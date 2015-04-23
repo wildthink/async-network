@@ -156,6 +156,10 @@
 		connect = self.autoConnect;
 	}
 	
+    if ([self.delegate respondsToSelector:@selector(client:event:object:)]) {
+        [self.delegate client:self event:AsyncClientDidFindServiceEvent object:netService];
+    }
+
 	// connect to the net service
 	if (connect) {
 		[self connectToService:netService];
@@ -169,6 +173,9 @@
 	if ([self.delegate respondsToSelector:@selector(client:didRemoveService:)]) {
 		[self.delegate client:self didRemoveService:netService];
 	}
+    if ([self.delegate respondsToSelector:@selector(client:event:object:)]) {
+        [self.delegate client:self event:AsyncClientDidRemoveServiceEvent object:netService];
+    }
 }
 
 
@@ -180,6 +187,9 @@
 	if ([self.delegate respondsToSelector:@selector(client:didConnect:)]) {
 		[self.delegate client:self didConnect:theConnection];
 	}
+    if ([self.delegate respondsToSelector:@selector(client:event:object:)]) {
+        [self.delegate client:self event:AsyncClientDidConnectEvent object:theConnection];
+    }
 }
 
 // the connection was disconnected
@@ -189,6 +199,9 @@
 	if ([self.delegate respondsToSelector:@selector(client:didDisconnect:)]) {
 		[self.delegate client:self didDisconnect:theConnection];
 	}
+    if ([self.delegate respondsToSelector:@selector(client:event:object:)]) {
+        [self.delegate client:self event:AsyncClientDidDisconnectEvent object:theConnection];
+    }
 }
 
 // incomding command
