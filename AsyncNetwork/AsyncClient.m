@@ -25,6 +25,14 @@
 #import "AsyncClient.h"
 #import "AsyncNetworkHelpers.h"
 
+
+@interface AsyncClient ()
+
+@property NSOperationQueue *messageQueue;
+
+@end
+
+
 @implementation AsyncClient
 
 @synthesize serviceBrowser = _serviceBrowser;
@@ -48,6 +56,9 @@
 		self.serviceDomain = AsyncNetworkDefaultServiceDomain;
 		_services = [NSMutableSet new];
 		_connections = [NSMutableSet new];
+        
+        self.messageQueue = [NSOperationQueue new];
+        self.messageQueue.name = [NSString stringWithFormat:@"%@ Message Queue", [self class]];
 	}
 	return self;
 }
@@ -121,12 +132,14 @@
 // send object to all servers
 - (void)sendCommand:(AsyncCommand)command object:(id<NSCoding>)object responseBlock:(AsyncNetworkResponseBlock)block;
 {
-	AsyncConnection *connection;
-	for (connection in self.connections) {
-		if(![connection connected]) continue;
-		[connection sendCommand:command object:object responseBlock:block];
-	}
-}
+    [self.messageQueue addOperationWithBlock:^{
+        AsyncConnection *connection;
+        for (connection in self.connections) {
+            if(![connection connected]) continue;
+            [connection sendCommand:command object:object responseBlock:block];
+        };
+    }];
+ }
 
 // send command and object without response block
 - (void)sendCommand:(AsyncCommand)command object:(id<NSCoding>)object;
