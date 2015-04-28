@@ -59,6 +59,7 @@
         
         self.messageQueue = [NSOperationQueue new];
         self.messageQueue.name = [NSString stringWithFormat:@"%@ Message Queue", [self class]];
+        self.messageQueue.maxConcurrentOperationCount = 1;
 	}
 	return self;
 }
